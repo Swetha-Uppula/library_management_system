@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+	<head>
+		<title>How to Add Speech Recognition to the Website - JavaScript</title>
+		<link href='style.css' rel='stylesheet' type='text/css'>
+		<script src="jquery-3.2.1.js"></script>
+		<script type='text/javascript'>
+		var recognition = new webkitSpeechRecognition();
+
+		recognition.onresult = function(event) { 
+			console.log('result');
+		  	var saidText = "";
+		  	for (var i = event.resultIndex; i < event.results.length; i++) {
+		        if (event.results[i].isFinal) {
+		            saidText = event.results[i][0].transcript;
+		        } else {
+		            saidText += event.results[i][0].transcript;
+		        }
+		    }
+		 	
+		    document.getElementById('speechText').value = saidText;
+		   	
+		   	// Search Posts
+		   	searchPosts(saidText,category);
+		}
+
+		function startRecording(){
+			recognition.start();
+		}
+
+		// Search Posts
+		function searchPosts(saidText,category){
+
+			$.ajax({
+				url: 'getData.php',
+				type: 'post',
+				data: {speechText: saidText,category:category},
+				success: function(response){
+					$('.container').empty();
+					$('.container').append(response);
+				}
+			});
+		}
+
+		</script>
+	</head>
+	<body>
+
+		<div class='search_container'>
+			<!-- Search box-->
+			<input type='text' id='speechText' > &nbsp; <input type='button' id='start' value='Voice Search' onclick='startRecording();'>
+		</div>
+		<br>
+		<div class='search_container'>
+		<select>
+		<option value="Book Name">Select </option>
+  <option value="Book Name">Book Name</option>
+  <option value="Genre">Genre</option>
+  <option value="Author">Author</option>
+  <option value="Publisher">Publisher</option>
+</select>
+</div>
+		<!-- Search Result -->
+		<div class="container"></div>
+
+	</body>
+</html>
